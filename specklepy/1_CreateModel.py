@@ -3,27 +3,36 @@
 
 NOTE: Project workspace in this case is: 128262a20c
 """
-from main import get_client
 from specklepy.api.client import SpeckleClient
 from specklepy.api.credentials import get_default_account
+from specklepy.core.api.inputs.model_inputs import CreateModelInput
 
-# Authenticate
-client = SpeckleClient(host="https://app.speckle.systems")
-account = get_default_account()
-client.authenticate_with_account(account)
+def main():
+    account = get_default_account()
 
-# Project ID (where the model will be created)
-project_id = "128262a20c"
+    # IMPORTANT: connect to the same server as the account
+    client = SpeckleClient(host=account.serverInfo.url)
+    client.authenticate_with_account(account)
 
-# Create the model with the folder path
-# Use forward slashes to separate folder levels
-model = client.model.create(
-    project_id=project_id,
-    name="team_01.1",
-    description="Model created in session03 subfolder",  # optional
-    folder_path="homework/session03"  # This targets the nested folder structure
-)
+    project_id = "128262a20c"
 
-print(f"Model created successfully!")
-print(f"Model ID: {model.id}")
-print(f"Model URL: https://app.speckle.systems/projects/{project_id}/models/{model.id}")
+    model_name = "homework/session03/team_01.1"
+
+    model = client.model.create(
+        CreateModelInput(
+            project_id=project_id,
+            name=model_name,
+            description="Model created in homework/session03"
+        )
+    )
+
+    print("✅ Model created")
+    print("Server:", account.serverInfo.url)
+    print("Project:", project_id)
+    print("Model:", model.name)
+    print("Model ID:", model.id)
+    print(f"URL: {account.serverInfo.url}/projects/{project_id}/models/{model.id}")
+
+if __name__ == "__main__":
+    main()
+
